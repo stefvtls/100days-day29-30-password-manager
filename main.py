@@ -1,7 +1,8 @@
 import tkinter
 from tkinter import messagebox
 import random
-import pyperclip
+import json
+# import pyperclip
 
 ### PASSWORD GENERATOR ###
 letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
@@ -15,7 +16,7 @@ def generate_password():
     random.shuffle(password_list)
     password = "".join(password_list)
     password_entry.insert(0, password)
-    pyperclip.copy(password)
+    # pyperclip.copy(password)
 ### END OF PASSSWORD GENERATOR###
 
 
@@ -51,12 +52,22 @@ def save():
     website_ent = website_entry.get()
     email_ent = email_entry.get()
     password_ent = password_entry.get()
+    ent = {website_ent: {email_ent: password_ent}}
 
     if len(website_ent) != 0 and len(email_ent) > 10 and len(password_ent) != 0:
         okcancel = tkinter.messagebox.askokcancel(title=f"save a new entry for {website_ent}", message=f'the entries are: \n login: {email_ent} \n password: {password_ent}. \n Save it?')
         if okcancel:
-            with open("data.txt", "a") as file:
-                file.write(f"{website_ent} | {email_ent} | {password_ent}\n")
+            # with open("data.txt", "a") as file:
+            #     file.write(f"{website_ent} | {email_ent} | {password_ent}\n")
+            try:
+                with open("data.json", "r") as file:
+                    saved = json.load(file)
+                    saved.update(ent)
+                with open("data.json", "w") as file:
+                    json.dump(saved, file, indent=4)
+            except FileNotFoundError:
+                with open("data.json", "w") as file:
+                    json.dump(ent,file, indent=4)
     else:
         tkinter.messagebox.showinfo(title="cannot save the entry", message="you ommited one or more entries. fill all the entries to save")
 
